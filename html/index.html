@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title></title>
+</head>
+<body>
+<div class="container">
+	<h3>Table with sortable headings and global search</h3>
+	<table id="sampleTableA" class="table table-striped sampleTable" border="1">
+		<thead>
+		<tr>
+			<th>Col A</th>
+			<th>Col B</th>
+			<th>Col C</th>
+		</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+	<div id="button_area">
+		<button id="input">上传excel文件</button>
+	</div>
+<input type="file" id="excel-file">
+<div id="result"> </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="./fancyTable.min.js"></script>
+<script src="https://cdn.bootcss.com/xlsx/0.11.5/xlsx.core.min.js"></script>
+<script  type="text/javascript" >
+$(document).ready(function() {
+	function rWord(r){var t,n="bcdfghjklmnpqrstvwxyz",a="aeiou",e=function(r){return Math.floor(Math.random()*r)},o="";r=parseInt(r,10),n=n.split(""),a=a.split("");for(t=0;t<r/2;t++){var l=n[e(n.length)],p=a[e(a.length)];o+=0===t?l.toUpperCase():l,o+=2*t<r-1?p:""}return o}
+	persons = []; // 存储获取到的数据 
+	for(var n=0;n<7;n++){
+		var row = $("<tr>");
+		$("#sampleTableA").find("thead th").each(function() {
+			$("<td>",{
+				html: "test1",
+				style:"padding:2px;"
+			}).appendTo($(row));
+		});
+		row.appendTo($("#sampleTableA").find("tbody"));
+	}
+	$("#sampleTableA").fancyTable({
+		searchable: true,
+        		sortColumn:0,
+        		pagination: true,
+        		perPage:5,
+        		globalSearch:true
+    	}); 
+$('#excel-file').change(function(e) { 
+	var files = e.target.files;
+	if (window.FileReader) {
+    		var fileReader = new FileReader();
+    		console.info(fileReader );
+	} else {
+   		alert("浏览器不支持!");
+	}
+	fileReader.onload = function(ev) { 
+		try { 
+			var data = ev.target.result,
+			workbook = XLSX.read(data, { type: 'binary' }), // 以二进制流方式读取得到整份excel表格对象 
+		} 
+		catch (e) { 
+			console.log('文件类型不正确'); 
+			return; 
+		}
+		// 遍历每张表读取 
+		console.log(workbook.Sheets);
+	 	// 表格的表格范围，可用于判断表头是否数量是否正确 
+		var fromTo = ''; 
+		//fromTo = workbook.Sheets['sheet1']['!ref'];
+		//console.log(fromTo);
+		
+
+		for (var sheet in workbook.Sheets) { 
+			if (workbook.Sheets.hasOwnProperty(sheet)) { 
+				var sheets = workbook.Sheets[sheet];
+				console.log(sheets);
+				fromTo = workbook.Sheets[sheet]['!ref'];
+				//console.log(sheets.A1.v);
+				for(var cell in sheets){
+					if(cell!="!margins"||cell!="!merges"||cell!="!ref"){
+						console.log(cell.charAt(0),cell.substring(1));
+						console.log(cell.charAt(0).concat(cell.substring(1)));
+						console.log(sheets[cell].v);
+						var obj = new Object();
+						obj = {
+								
+						} 
+					}else{
+						//console.log(cell);
+					}
+				}
+			 } else{
+				console.log("工作页为空!");
+			}
+		}
+	};
+	// 以二进制方式打开文件 
+	fileReader.readAsBinaryString(files[0]);
+ });
+
+}); 
+</script>
+</body>
+</html>
