@@ -50,58 +50,59 @@ $(document).ready(function() {
         		perPage:5,
         		globalSearch:true
     	}); 
-$('#excel-file').change(function(e) { 
-	var files = e.target.files;
-	if (window.FileReader) {
-    		var fileReader = new FileReader();
-    		console.info(fileReader );
-	} else {
-   		alert("浏览器不支持!");
-	}
-	fileReader.onload = function(ev) { 
-		try { 
-			var data = ev.target.result,
-			workbook = XLSX.read(data, { type: 'binary' }), // 以二进制流方式读取得到整份excel表格对象 
-		} 
-		catch (e) { 
-			console.log('文件类型不正确'); 
-			return; 
+	$('#excel-file').change(function(e) { 
+		var files = e.target.files;
+		if (window.FileReader) {
+	    		var fileReader = new FileReader();
+	    		console.info(fileReader );
+		} else {
+	   		alert("浏览器不支持!");
 		}
-		// 遍历每张表读取 
-		console.log(workbook.Sheets);
-	 	// 表格的表格范围，可用于判断表头是否数量是否正确 
-		var fromTo = ''; 
-		//fromTo = workbook.Sheets['sheet1']['!ref'];
-		//console.log(fromTo);
+		fileReader.onload = function(ev) { 
+			try { 
+				var data = ev.target.result;
+				workbook = XLSX.read(data, { type: 'binary' });// 以二进制流方式读取得到整份excel表格对象 
+			}
+			catch (e) { 
+				console.log('文件类型不正确'); 
+				return; 
+			}
+			// 遍历每张表读取 
+			console.log(workbook.Sheets);
+		 	// 表格的表格范围，可用于判断表头是否数量是否正确 
+			var fromTo = ''; 
+			//fromTo = workbook.Sheets['sheet1']['!ref'];
+			//console.log(fromTo);
 		
 
-		for (var sheet in workbook.Sheets) { 
-			if (workbook.Sheets.hasOwnProperty(sheet)) { 
-				var sheets = workbook.Sheets[sheet];
-				console.log(sheets);
-				fromTo = workbook.Sheets[sheet]['!ref'];
-				//console.log(sheets.A1.v);
-				for(var cell in sheets){
-					if(cell!="!margins"||cell!="!merges"||cell!="!ref"){
-						console.log(cell.charAt(0),cell.substring(1));
-						console.log(cell.charAt(0).concat(cell.substring(1)));
-						console.log(sheets[cell].v);
-						var obj = new Object();
-						obj = {
-								
-						} 
-					}else{
-						//console.log(cell);
+			for (var sheet in workbook.Sheets) { 
+				if (workbook.Sheets.hasOwnProperty(sheet)) { 
+					var sheets = workbook.Sheets[sheet];
+					console.log(sheets);
+					fromTo = workbook.Sheets[sheet]['!ref'];
+					//console.log(sheets.A1.v);
+					for(var cell in sheets){
+						if(cell!="!margins"||cell!="!merges"||cell!="!ref"){
+							// console.log(cell.charAt(0),cell.substring(1));
+							// console.log(cell.charAt(0).concat(cell.substring(1)));
+							// console.log(sheets[cell].v);
+							var obj = new Object();
+							obj = {
+									
+							} 
+						}else{
+							//console.log(cell);
+						}
 					}
+					break;
+				} else{
+					console.log("工作页为空!");
 				}
-			 } else{
-				console.log("工作页为空!");
 			}
-		}
-	};
+		};
 	// 以二进制方式打开文件 
 	fileReader.readAsBinaryString(files[0]);
- });
+	});
 
 }); 
 </script>
