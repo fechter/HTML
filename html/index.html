@@ -4,99 +4,122 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<title></title>
+	<style type="text/css">
+
+	table { width:800px; margin:50px auto; border-collapse:collapse; border-spacing:0; }
+
+	table tr, table th, table td { border:1px solid #ddd; font-size:12px; }
+
+	table tr td:first-child { width:30px; text-align:center; }
+
+	table td input { width:100%; height:100%; padding:5px 0; border:0 none; }
+
+	table td input:focus { box-shadow:1px 1px 3px #ddd inset; outline:none; }
+
+	</style>
+	<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.15.3/dist/bootstrap-table.min.css">
 </head>
 <body>
-<div class="container">
+<div class="container" >
 	<h3>Table with sortable headings and global search</h3>
-	<table id="sampleTableA" class="table table-striped sampleTable" border="1">
-		<thead>
-		<tr>
-			<th>Col A</th>
-			<th>Col B</th>
-			<th>Col C</th>
-		</tr>
-		</thead>
-		<tbody>
-		</tbody>
+	<table id="table" data-toggle="table"
+  data-pagination="true"
+  data-search="true">
 	</table>
-	<div id="button_area">
-		<button id="input">上传excel文件</button>
-	</div>
-<input type="file" id="excel-file">
-<div id="result"> </div>
 </div>
+<div id="button_area">
+		<input id="excel-file" type="file" />
+	</div>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script type="text/javascript" charset="utf-8" src="./fancyTable.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script src="https://cdn.bootcss.com/xlsx/0.11.5/xlsx.core.min.js"></script>
+<script src="https://unpkg.com/bootstrap-table@1.15.3/dist/bootstrap-table.min.js"></script>
+
 <script  type="text/javascript" >
-$(document).ready(function() {
-	function rWord(r){var t,n="bcdfghjklmnpqrstvwxyz",a="aeiou",e=function(r){return Math.floor(Math.random()*r)},o="";r=parseInt(r,10),n=n.split(""),a=a.split("");for(t=0;t<r/2;t++){var l=n[e(n.length)],p=a[e(a.length)];o+=0===t?l.toUpperCase():l,o+=2*t<r-1?p:""}return o}
-	persons = []; // 存储获取到的数据 
-	for(var n=0;n<7;n++){
-		var row = $("<tr>");
-		$("#sampleTableA").find("thead th").each(function() {
-			$("<td>",{
-				html: "test1",
-				style:"padding:2px;"
-			}).appendTo($(row));
-		});
-		row.appendTo($("#sampleTableA").find("tbody"));
-	}
-	$("#sampleTableA").fancyTable({
-		searchable: true,
-        		sortColumn:0,
-        		pagination: true,
-        		perPage:5,
-        		globalSearch:true
-    	}); 
-	$('#excel-file').change(function(e) { 
-		var files = e.target.files;
+$(document).ready(function (index) {
+	$('#table').bootstrapTable({
+	  columns: [{
+		field: 'id',
+		title: 'Item ID'
+	  }, {
+		field: 'name',
+		title: 'Item Name'
+	  }, {
+		field: 'price',
+		title: 'Item Price'
+	  }],
+	  data: [{
+		id: 1,
+		name: 'Item 1',
+		price: '$1'
+	  }, {
+		id: 2,
+		name: 'Item 2',
+		price: '$2'
+	  }]
+	});
+
+	$('#excel-file').change(function(e) {
+		const files = e.target.files;
 		if (window.FileReader) {
-	    		var fileReader = new FileReader();
-	    		console.info(fileReader );
+			var fileReader = new FileReader();
+			// console.info(fileReader);
 		} else {
 	   		alert("浏览器不支持!");
 		}
-		fileReader.onload = function(ev) { 
-			try { 
-				var data = ev.target.result;
-				workbook = XLSX.read(data, { type: 'binary' });// 以二进制流方式读取得到整份excel表格对象 
+
+		fileReader.onload = function(ev) {
+			try {
+				let data = ev.target.result;
+				workbook = XLSX.read(data, { type: 'binary' });// 以二进制流方式读取得到整份excel表格对象
 			}
-			catch (e) { 
-				console.log('文件类型不正确'); 
-				return; 
+			catch (e) {
+				console.log('文件类型不正确');
+				return;
 			}
 			// 遍历每张表读取 
 			console.log(workbook.Sheets);
-		 	// 表格的表格范围，可用于判断表头是否数量是否正确 
-			var fromTo = ''; 
-			//fromTo = workbook.Sheets['sheet1']['!ref'];
-			//console.log(fromTo);
-		
-
-			for (var sheet in workbook.Sheets) { 
+			for (let sheet in workbook.Sheets) {
 				if (workbook.Sheets.hasOwnProperty(sheet)) { 
-					var sheets = workbook.Sheets[sheet];
-					console.log(sheets);
-					fromTo = workbook.Sheets[sheet]['!ref'];
-					//console.log(sheets.A1.v);
-					for(var cell in sheets){
-						if(cell!="!margins"||cell!="!merges"||cell!="!ref"){
-							// console.log(cell.charAt(0),cell.substring(1));
-							// console.log(cell.charAt(0).concat(cell.substring(1)));
-							// console.log(sheets[cell].v);
-							var obj = new Object();
-							obj = {
-									
-							} 
-						}else{
-							//console.log(cell);
+					let book = workbook.Sheets[sheet];
+					console.log("原始表格：", book);
+					// 表格的表格范围，可用于判断表头是否数量是否正确
+					let fromTo = workbook.Sheets[sheet]['!ref'];
+					console.log(fromTo);
+					let book_head = data_area(fromTo)[0];
+					let book_tail = data_area(fromTo)[1];
+
+					console.info(cell_Id(book_head)[0], cell_Id(book_tail)[1]);
+					let book_head_num = cell_Id(book_head)[0].charCodeAt();
+					let book_tail_num = cell_Id(book_tail)[0].charCodeAt();
+					for(let row = cell_Id(book_head)[1]; row <= cell_Id(book_tail)[1]; row++){
+						let tr_line = '<tr>';
+						for(let line = book_head_num; line <= book_tail_num; line++){
+							//console.log(String.fromCharCode(line));
+							if(row === 1){
+								tr_line += '<th>' + book[String.fromCharCode(line)+row].v;
+								tr_line += '</rh>';
+							} else {
+								tr_line += '<td>' + book[String.fromCharCode(line)+row].v;
+								tr_line += '</td>';
+							}
+						}
+						tr_line += '</tr>';
+
+						if(row == 1){
+							$("#sampleTableA thead").append(tr_line);
+							console.log(tr_line);
+						}else {
+							$("#sampleTableA tbody").html(tr_line);
 						}
 					}
-					break;
+					// break;
 				} else{
 					console.log("工作页为空!");
+					break;
 				}
 			}
 		};
@@ -104,6 +127,14 @@ $(document).ready(function() {
 	fileReader.readAsBinaryString(files[0]);
 	});
 
+	function data_area(e) {
+		return e.split(':')
+	}
+	
+	function cell_Id(e) {
+		// 单元格行列
+		return [e.substr(0, 1), e.substr(1)]
+	}
 }); 
 </script>
 </body>
